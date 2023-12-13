@@ -25,6 +25,23 @@ def get_ru_sci_bench_metrics(
     max_iter: int = 100,
     silent=False
 ) -> dict:
+    """Run ruSciBench tasks.
+
+    Arguments:
+        embeddings_path -- path to the embeddings jsonl
+        metrics -- metric name or list of metrics names to calculate (ru_, en_, full_ classification
+            task or translation_search) or 'all'
+        get_cls_report -- return classification_report in classification tasks
+        grid_search_cv -- do cross-validation search of regularization parameter C in classification tasks
+        n_jobs -- number of jobs to run in parallel in GridSearchCV (classification)
+            or NearestNeighbors (translation_search)
+        max_iter -- the maximum number of iterations to fit LinearSVC model (classification)
+        silent -- silent all outputs
+
+    Returns:
+        metrics {dict} -- Dictionary with macro average F1, weighted average F1 and optionally classification_report
+            for classification tasks and Recall@1 for translation_search task
+    """
     data_paths = DataPaths()
     print('Loading embeddings...')
     embeddings = load_embeddings_from_jsonl(embeddings_path)
@@ -51,7 +68,7 @@ def get_ru_sci_bench_metrics(
         )
         print_metrics('en_ru_translation_search', results, silent)
 
-    if metrics in ['all', 'full'] or 'full' in metrics:
+    if metrics in ['all', 'full_classification'] or 'full_classification' in metrics:
         if not silent:
             print('Running the eLibrary OECD-full task...')
         X_train, X_test, y_train, y_test = get_X_y_for_classification(
@@ -61,7 +78,7 @@ def get_ru_sci_bench_metrics(
         )
         results['elibrary_oecd_full'] = classify(
             X_train, y_train, X_test, y_test, get_cls_report=get_cls_report,
-            grid_search_cv=grid_search_cv, n_jobs=n_jobs, max_iter=max_iter
+            grid_search_cv=grid_search_cv, n_jobs=n_jobs, max_iter=max_iter, silent=silent
         )
         print_metrics('elibrary_oecd_full', results, silent)
 
@@ -74,11 +91,11 @@ def get_ru_sci_bench_metrics(
         )
         results['elibrary_grnti_full'] = classify(
             X_train, y_train, X_test, y_test, get_cls_report=get_cls_report,
-            grid_search_cv=grid_search_cv, n_jobs=n_jobs, max_iter=max_iter
+            grid_search_cv=grid_search_cv, n_jobs=n_jobs, max_iter=max_iter, silent=silent
         )
         print_metrics('elibrary_grnti_full', results, silent)
 
-    if metrics in ['all', 'ru'] or 'ru' in metrics:
+    if metrics in ['all', 'ru_classification'] or 'ru_classification' in metrics:
         if not silent:
             print('Running the eLibrary OECD-ru task...')
         X_train, X_test, y_train, y_test = get_X_y_for_classification(
@@ -90,7 +107,7 @@ def get_ru_sci_bench_metrics(
             print('Classifier training...')
         results['elibrary_oecd_ru'] = classify(
             X_train, y_train, X_test, y_test, get_cls_report=get_cls_report,
-            grid_search_cv=grid_search_cv, n_jobs=n_jobs, max_iter=max_iter
+            grid_search_cv=grid_search_cv, n_jobs=n_jobs, max_iter=max_iter, silent=silent
         )
         print_metrics('elibrary_oecd_ru', results, silent)
 
@@ -105,11 +122,11 @@ def get_ru_sci_bench_metrics(
             print('Classifier training...')
         results['elibrary_grnti_ru'] = classify(
             X_train, y_train, X_test, y_test, get_cls_report=get_cls_report,
-            grid_search_cv=grid_search_cv, n_jobs=n_jobs, max_iter=max_iter
+            grid_search_cv=grid_search_cv, n_jobs=n_jobs, max_iter=max_iter, silent=silent
         )
         print_metrics('elibrary_grnti_ru', results, silent)
 
-    if metrics in ['all', 'en'] or 'en' in metrics:
+    if metrics in ['all', 'en_classification'] or 'en_classification' in metrics:
         if not silent:
             print('Running the eLibrary OECD-en task...')
         X_train, X_test, y_train, y_test = get_X_y_for_classification(
@@ -121,7 +138,7 @@ def get_ru_sci_bench_metrics(
             print('Classifier training...')
         results['elibrary_oecd_en'] = classify(
             X_train, y_train, X_test, y_test, get_cls_report=get_cls_report,
-            grid_search_cv=grid_search_cv, n_jobs=n_jobs, max_iter=max_iter
+            grid_search_cv=grid_search_cv, n_jobs=n_jobs, max_iter=max_iter, silent=silent
         )
         print_metrics('elibrary_oecd_en', results, silent)
 
@@ -136,7 +153,7 @@ def get_ru_sci_bench_metrics(
             print('Classifier training...')
         results['elibrary_grnti_en'] = classify(
             X_train, y_train, X_test, y_test, get_cls_report=get_cls_report,
-            grid_search_cv=grid_search_cv, n_jobs=n_jobs, max_iter=max_iter
+            grid_search_cv=grid_search_cv, n_jobs=n_jobs, max_iter=max_iter, silent=silent
         )
         print_metrics('elibrary_grnti_en', results, silent)
 
@@ -151,7 +168,8 @@ def classify(
     grid_search_cv: bool = False,
     n_jobs: int = -1,
     max_iter: int = 100,
-    get_cls_report: bool = False
+    get_cls_report: bool = False,
+    silent: bool = False
 ) -> dict:
     """
     Simple classification method using sklearn framework. LinearSVC model fits with default parameters.
@@ -175,7 +193,7 @@ def classify(
             estimator=estimator,
             cv=3,
             param_grid={'C': np.logspace(-4, 2, 7)},
-            verbose=1,
+            verbose=not silent,
             n_jobs=n_jobs
         )
     else:
@@ -260,5 +278,5 @@ def translation_search(
     nearest_neighbor.fit(results_embs)
     _, top_index = nearest_neighbor.kneighbors(queries_embs)
     correct_indexes = np.arange(results_embs.shape[0])
-    is_correct = (top_index == correct_indexes).nonzero()[0]
+    is_correct = (top_index.flatten() == correct_indexes).nonzero()[0]
     return {'recall@1': is_correct.shape[0] / len(correct_indexes)}

@@ -61,6 +61,8 @@ def print_metrics(
     if silent:
         return
 
+    print('-' * 30)
     for metric_name, value in results[task_name].items():
-        print(f'{metric_name} | = {value}')
-    print('-' * 30 + '\n')
+        if metric_name != 'cls_report':
+            print(f'{task_name} | {metric_name} | = {round(value, 2)}')
+    print('-' * 30)
