@@ -3,7 +3,7 @@ import numpy as np
 from tqdm import tqdm
 import os
 
-PROJECT_ROOT_PATH = os.path.abspath(os.path.join(os.getcwd()))
+PROJECT_ROOT_PATH = os.path.abspath(os.path.dirname(__file__))
 
 
 class DataPaths:

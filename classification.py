@@ -233,8 +233,8 @@ def get_embeddings_for_translation_search(
     with open(translation_test_path) as f:
         translation_test = json.load(f)
 
-    ru_embs = np.array([embeddings[id_] for id_ in translation_test.keys()])
-    en_embs = np.array([embeddings[id_] for id_ in translation_test.values()])
+    ru_embs = np.array([embeddings[int(id_)] for id_ in translation_test.keys()])
+    en_embs = np.array([embeddings[int(id_)] for id_ in translation_test.values()])
     return ru_embs, en_embs
 
 
