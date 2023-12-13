@@ -1,15 +1,12 @@
-from collections import defaultdict
-# from typing import Str, List
+import json
+from typing import Union
 
-import os
 import numpy as np
 import pandas as pd
-import json
-from sklearn.svm import LinearSVC
-from sklearn.metrics import f1_score
-from sklearn.metrics import classification_report
+from sklearn.metrics import classification_report, f1_score
 from sklearn.model_selection import GridSearchCV
 from sklearn.neighbors import NearestNeighbors
+from sklearn.svm import LinearSVC
 
 from utils import DataPaths, load_embeddings_from_jsonl, print_metrics
 
@@ -18,12 +15,12 @@ np.random.seed(1)
 
 def get_ru_sci_bench_metrics(
     embeddings_path: str,
-    metrics: str or list[str] = 'all',
+    metrics: Union[str, list[str]] = "all",
     get_cls_report: bool = False,
     grid_search_cv: bool = False,
     n_jobs: int = -1,
     max_iter: int = 100,
-    silent: bool = False
+    silent: bool = False,
 ) -> dict:
     """Run ruSciBench tasks.
 
@@ -45,119 +42,158 @@ def get_ru_sci_bench_metrics(
     """
     data_paths = DataPaths()
     if not silent:
-        print('Loading embeddings...')
+        print("Loading embeddings...")
     embeddings = load_embeddings_from_jsonl(embeddings_path)
 
     results = {}
 
-    if metrics in ['all', 'translation_search'] or 'translation_search' in metrics:
+    if metrics in ["all", "translation_search"] or "translation_search" in metrics:
         if not silent:
-            print('Running the eLibrary translation search task...')
+            print("Running the eLibrary translation search task...")
         ru_embs, en_embs = get_embeddings_for_translation_search(
-            embeddings, data_paths.ru_en_translation_test)
-
-        results['ru_en_translation_search'] = translation_search(
-            queries_embs=ru_embs,
-            results_embs=en_embs,
-            n_jobs=n_jobs
+            embeddings, data_paths.ru_en_translation_test
         )
-        print_metrics('ru_en_translation_search', results, silent)
 
-        results['en_ru_translation_search'] = translation_search(
-            queries_embs=en_embs,
-            results_embs=ru_embs,
-            n_jobs=n_jobs
+        results["ru_en_translation_search"] = translation_search(
+            queries_embs=ru_embs, results_embs=en_embs, n_jobs=n_jobs
         )
-        print_metrics('en_ru_translation_search', results, silent)
+        print_metrics("ru_en_translation_search", results, silent)
 
-    if metrics in ['all', 'full_classification'] or 'full_classification' in metrics:
+        results["en_ru_translation_search"] = translation_search(
+            queries_embs=en_embs, results_embs=ru_embs, n_jobs=n_jobs
+        )
+        print_metrics("en_ru_translation_search", results, silent)
+
+    if metrics in ["all", "full_classification"] or "full_classification" in metrics:
         if not silent:
-            print('Running the eLibrary OECD-full task...')
+            print("Running the eLibrary OECD-full task...")
         X_train, X_test, y_train, y_test = get_X_y_for_classification(
             embeddings,
             data_paths.elibrary_oecd_full_train,
             data_paths.elibrary_oecd_full_test,
         )
-        results['elibrary_oecd_full'] = classify(
-            X_train, y_train, X_test, y_test, get_cls_report=get_cls_report,
-            grid_search_cv=grid_search_cv, n_jobs=n_jobs, max_iter=max_iter, silent=silent
+        results["elibrary_oecd_full"] = classify(
+            X_train,
+            y_train,
+            X_test,
+            y_test,
+            get_cls_report=get_cls_report,
+            grid_search_cv=grid_search_cv,
+            n_jobs=n_jobs,
+            max_iter=max_iter,
+            silent=silent,
         )
-        print_metrics('elibrary_oecd_full', results, silent)
+        print_metrics("elibrary_oecd_full", results, silent)
 
         if not silent:
-            print('Running the eLibrary GRNTI-full task...')
+            print("Running the eLibrary GRNTI-full task...")
         X_train, X_test, y_train, y_test = get_X_y_for_classification(
             embeddings,
             data_paths.elibrary_grnti_full_train,
             data_paths.elibrary_grnti_full_test,
         )
-        results['elibrary_grnti_full'] = classify(
-            X_train, y_train, X_test, y_test, get_cls_report=get_cls_report,
-            grid_search_cv=grid_search_cv, n_jobs=n_jobs, max_iter=max_iter, silent=silent
+        results["elibrary_grnti_full"] = classify(
+            X_train,
+            y_train,
+            X_test,
+            y_test,
+            get_cls_report=get_cls_report,
+            grid_search_cv=grid_search_cv,
+            n_jobs=n_jobs,
+            max_iter=max_iter,
+            silent=silent,
         )
-        print_metrics('elibrary_grnti_full', results, silent)
+        print_metrics("elibrary_grnti_full", results, silent)
 
-    if metrics in ['all', 'ru_classification'] or 'ru_classification' in metrics:
+    if metrics in ["all", "ru_classification"] or "ru_classification" in metrics:
         if not silent:
-            print('Running the eLibrary OECD-ru task...')
+            print("Running the eLibrary OECD-ru task...")
         X_train, X_test, y_train, y_test = get_X_y_for_classification(
             embeddings,
             data_paths.elibrary_oecd_ru_train,
             data_paths.elibrary_oecd_ru_test,
         )
         if not silent:
-            print('Classifier training...')
-        results['elibrary_oecd_ru'] = classify(
-            X_train, y_train, X_test, y_test, get_cls_report=get_cls_report,
-            grid_search_cv=grid_search_cv, n_jobs=n_jobs, max_iter=max_iter, silent=silent
+            print("Classifier training...")
+        results["elibrary_oecd_ru"] = classify(
+            X_train,
+            y_train,
+            X_test,
+            y_test,
+            get_cls_report=get_cls_report,
+            grid_search_cv=grid_search_cv,
+            n_jobs=n_jobs,
+            max_iter=max_iter,
+            silent=silent,
         )
-        print_metrics('elibrary_oecd_ru', results, silent)
+        print_metrics("elibrary_oecd_ru", results, silent)
 
         if not silent:
-            print('Running the eLibrary GRNTI-ru task...')
+            print("Running the eLibrary GRNTI-ru task...")
         X_train, X_test, y_train, y_test = get_X_y_for_classification(
             embeddings,
             data_paths.elibrary_grnti_ru_train,
             data_paths.elibrary_grnti_ru_test,
         )
         if not silent:
-            print('Classifier training...')
-        results['elibrary_grnti_ru'] = classify(
-            X_train, y_train, X_test, y_test, get_cls_report=get_cls_report,
-            grid_search_cv=grid_search_cv, n_jobs=n_jobs, max_iter=max_iter, silent=silent
+            print("Classifier training...")
+        results["elibrary_grnti_ru"] = classify(
+            X_train,
+            y_train,
+            X_test,
+            y_test,
+            get_cls_report=get_cls_report,
+            grid_search_cv=grid_search_cv,
+            n_jobs=n_jobs,
+            max_iter=max_iter,
+            silent=silent,
         )
-        print_metrics('elibrary_grnti_ru', results, silent)
+        print_metrics("elibrary_grnti_ru", results, silent)
 
-    if metrics in ['all', 'en_classification'] or 'en_classification' in metrics:
+    if metrics in ["all", "en_classification"] or "en_classification" in metrics:
         if not silent:
-            print('Running the eLibrary OECD-en task...')
+            print("Running the eLibrary OECD-en task...")
         X_train, X_test, y_train, y_test = get_X_y_for_classification(
             embeddings,
             data_paths.elibrary_oecd_en_train,
             data_paths.elibrary_oecd_en_test,
         )
         if not silent:
-            print('Classifier training...')
-        results['elibrary_oecd_en'] = classify(
-            X_train, y_train, X_test, y_test, get_cls_report=get_cls_report,
-            grid_search_cv=grid_search_cv, n_jobs=n_jobs, max_iter=max_iter, silent=silent
+            print("Classifier training...")
+        results["elibrary_oecd_en"] = classify(
+            X_train,
+            y_train,
+            X_test,
+            y_test,
+            get_cls_report=get_cls_report,
+            grid_search_cv=grid_search_cv,
+            n_jobs=n_jobs,
+            max_iter=max_iter,
+            silent=silent,
         )
-        print_metrics('elibrary_oecd_en', results, silent)
+        print_metrics("elibrary_oecd_en", results, silent)
 
         if not silent:
-            print('Running the eLibrary GRNTI-en task...')
+            print("Running the eLibrary GRNTI-en task...")
         X_train, X_test, y_train, y_test = get_X_y_for_classification(
             embeddings,
             data_paths.elibrary_grnti_en_train,
             data_paths.elibrary_grnti_en_test,
         )
         if not silent:
-            print('Classifier training...')
-        results['elibrary_grnti_en'] = classify(
-            X_train, y_train, X_test, y_test, get_cls_report=get_cls_report,
-            grid_search_cv=grid_search_cv, n_jobs=n_jobs, max_iter=max_iter, silent=silent
+            print("Classifier training...")
+        results["elibrary_grnti_en"] = classify(
+            X_train,
+            y_train,
+            X_test,
+            y_test,
+            get_cls_report=get_cls_report,
+            grid_search_cv=grid_search_cv,
+            n_jobs=n_jobs,
+            max_iter=max_iter,
+            silent=silent,
         )
-        print_metrics('elibrary_grnti_en', results, silent)
+        print_metrics("elibrary_grnti_en", results, silent)
 
     return results
 
@@ -171,7 +207,7 @@ def classify(
     n_jobs: int = -1,
     max_iter: int = 100,
     get_cls_report: bool = False,
-    silent: bool = False
+    silent: bool = False,
 ) -> dict:
     """
     Simple classification method using sklearn framework. LinearSVC model fits with default parameters.
@@ -190,32 +226,30 @@ def classify(
         metrics -- dict with macro average F1, weighted average F1 and optionally classification_report
             on X_test, y_test
     """
-    estimator = LinearSVC(loss='squared_hinge', max_iter=max_iter, random_state=42)
+    estimator = LinearSVC(loss="squared_hinge", max_iter=max_iter, random_state=42)
     if grid_search_cv:
         svm = GridSearchCV(
             estimator=estimator,
             cv=3,
-            param_grid={'C': np.logspace(-4, 2, 7)},
+            param_grid={"C": np.logspace(-4, 2, 7)},
             verbose=not silent,
-            n_jobs=n_jobs
+            n_jobs=n_jobs,
         )
     else:
         svm = estimator
     svm.fit(X_train, y_train)
     y_pred = svm.predict(X_test)
     result = {
-        'macro_f1': f1_score(y_test, y_pred, average='macro'),
-        'weighted_f1': f1_score(y_test, y_pred, average='weighted')
+        "macro_f1": f1_score(y_test, y_pred, average="macro"),
+        "weighted_f1": f1_score(y_test, y_pred, average="weighted"),
     }
     if get_cls_report:
-        result['cls_report'] = classification_report(y_test, y_pred)
+        result["cls_report"] = classification_report(y_test, y_pred)
     return result
 
 
 def get_X_y_for_classification(
-    embeddings: dict,
-    train_path: str,
-    test_path: str
+    embeddings: dict, train_path: str, test_path: str
 ) -> tuple[np.array, np.array, np.array, np.array]:
     """
     Preparing data for classification task
@@ -236,8 +270,7 @@ def get_X_y_for_classification(
 
 
 def get_embeddings_for_translation_search(
-    embeddings: dict,
-    translation_test_path: str
+    embeddings: dict, translation_test_path: str
 ) -> tuple[np.array, np.array]:
     """
     Preparing data for translation_search task
@@ -257,10 +290,8 @@ def get_embeddings_for_translation_search(
 
 
 def translation_search(
-    queries_embs: np.array,
-    results_embs: np.array,
-    n_jobs: int = -1
-) -> dict:
+    queries_embs: np.array, results_embs: np.array, n_jobs: int = -1
+) -> dict[str, float]:
     """
     Method for checking whether the closest embedding in the dataset to the embedding
         of a text is of its translation. Returns a proportion of texts in the dataset for
@@ -274,9 +305,9 @@ def translation_search(
     Returns:
         Dictionary with recall@1 metric
     """
-    nearest_neighbor = NearestNeighbors(n_neighbors=1, metric='cosine', n_jobs=n_jobs)
+    nearest_neighbor = NearestNeighbors(n_neighbors=1, metric="cosine", n_jobs=n_jobs)
     nearest_neighbor.fit(results_embs)
     _, top_index = nearest_neighbor.kneighbors(queries_embs)
     correct_indexes = np.arange(results_embs.shape[0])
     is_correct = (top_index.flatten() == correct_indexes).nonzero()[0]
-    return {'recall@1': is_correct.shape[0] / len(correct_indexes)}
+    return {"recall@1": is_correct.shape[0] / len(correct_indexes)}
