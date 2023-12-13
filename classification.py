@@ -222,8 +222,8 @@ def get_X_y_for_classification(
 
     Arguments:
         embeddings: embeddings dict
-        train_path: directory where the train ids/labels are stored
-        test_path: directory where the test ids/labels are stored
+        train_path: path to the csv with train ids/labels
+        test_path: path to the csv with test ids/labels
 
     Returns:
         X_train, X_test, y_train, y_test: train/test embeddings and labels
