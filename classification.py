@@ -44,7 +44,8 @@ def get_ru_sci_bench_metrics(
             for classification tasks and Recall@1 for translation_search task
     """
     data_paths = DataPaths()
-    print('Loading embeddings...')
+    if not silent:
+        print('Loading embeddings...')
     embeddings = load_embeddings_from_jsonl(embeddings_path)
 
     results = {}
