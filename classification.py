@@ -29,13 +29,14 @@ def get_ru_sci_bench_metrics(
 
     Arguments:
         embeddings_path -- path to the jsonl with embeddings
-        metrics -- metric name or list of metrics names to calculate (ru_, en_, full_ classification
-            task or translation_search) or 'all'
-        get_cls_report -- if True will return classification_report in classification tasks
-        grid_search_cv -- if True will use cross-validation to choose regularization parameter C in classification tasks
+        metrics -- metric or list of metrics to calculate (ru_, en_, full_ classification
+            tasks or translation_search) or 'all'
+        get_cls_report -- if True, will return classification_report in classification tasks
+        grid_search_cv -- if True, will use cross-validation to choose regularization parameter
+            C in classification tasks
         n_jobs -- number of jobs to run in parallel in GridSearchCV (classification)
             or NearestNeighbors (translation_search)
-        max_iter -- the maximum number of iterations to fit LinearSVC model (classification)
+        max_iter -- maximum number of iterations to fit LinearSVC model (classification)
         silent -- silent all outputs
 
     Returns:
@@ -178,7 +179,8 @@ def classify(
     Arguments:
         X_train, y_train -- training data
         X_test, y_test -- test data to evaluate on
-        grid_search_cv -- do cross-validation search of regularization parameter C
+        grid_search_cv -- if True, will use cross-validation to choose regularization parameter
+            C in classification tasks
         n_jobs -- number of jobs to run in parallel in GridSearchCV
         max_iter -- the maximum number of iterations to fit LinearSVC model
         get_cls_report -- return classification_report
