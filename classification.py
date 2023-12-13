@@ -28,18 +28,18 @@ def get_ru_sci_bench_metrics(
     """Run ruSciBench tasks.
 
     Arguments:
-        embeddings_path -- path to the embeddings jsonl
+        embeddings_path -- path to the jsonl with embeddings
         metrics -- metric name or list of metrics names to calculate (ru_, en_, full_ classification
             task or translation_search) or 'all'
-        get_cls_report -- return classification_report in classification tasks
-        grid_search_cv -- do cross-validation search of regularization parameter C in classification tasks
+        get_cls_report -- if True will return classification_report in classification tasks
+        grid_search_cv -- if True will use cross-validation to choose regularization parameter C in classification tasks
         n_jobs -- number of jobs to run in parallel in GridSearchCV (classification)
             or NearestNeighbors (translation_search)
         max_iter -- the maximum number of iterations to fit LinearSVC model (classification)
         silent -- silent all outputs
 
     Returns:
-        metrics {dict} -- Dictionary with macro average F1, weighted average F1 and optionally classification_report
+        metrics -- dictionary with macro average F1, weighted average F1 and optionally classification_report
             for classification tasks and Recall@1 for translation_search task
     """
     data_paths = DataPaths()
@@ -184,7 +184,7 @@ def classify(
         get_cls_report -- return classification_report
 
     Returns:
-        Dictionary with macro average F1, weighted average F1 and optionally classification_report
+        metrics -- dict with macro average F1, weighted average F1 and optionally classification_report
             on X_test, y_test
     """
     estimator = LinearSVC(loss='squared_hinge', max_iter=max_iter, random_state=42)
@@ -215,8 +215,7 @@ def get_X_y_for_classification(
     test_path: str
 ) -> tuple[np.array, np.array, np.array, np.array]:
     """
-    Given the directory with train/test files for classification
-        and embeddings, returns data as X, y pair
+    Preparing data for classification task
 
     Arguments:
         embeddings: embeddings dict
@@ -238,19 +237,17 @@ def get_embeddings_for_translation_search(
     translation_test_path: str
 ) -> tuple[np.array, np.array]:
     """
-    Given the directory with russian-english translations file for translation
-        search task and embeddings, returns lists of embeddings for texts in russian and english
+    Preparing data for translation_search task
 
     Arguments:
         embeddings: embeddings dict
-        translation_test_path: directory where the russian-english translations file
+        translation_test_path: path to the russian-english translations file
 
     Returns:
         ru_embs, en_embs: embeddings for texts in russian and english
     """
     with open(translation_test_path) as f:
         translation_test = json.load(f)
-
     ru_embs = np.array([embeddings[int(id_)] for id_ in translation_test.keys()])
     en_embs = np.array([embeddings[int(id_)] for id_ in translation_test.values()])
     return ru_embs, en_embs
@@ -262,13 +259,13 @@ def translation_search(
     n_jobs: int = -1
 ) -> dict:
     """
-    Method to check if the text and its translation have the closest embeddings along the dataset.
-        Returns rate of pairs in the dataset for which this is true. NearestNeighbors model fits
-        with the cosine metric.
+    Method for checking whether the closest embedding in the dataset to the embedding
+        of a text is of its translation. Returns the proportion of texts in the dataset for
+        which it is true.
 
     Arguments:
         queries_embs -- embeddings to use as queries
-        results_embs -- embeddings to use as base to search in
+        results_embs -- embeddings to use for searching
         n_jobs -- number of jobs to run in parallel in NearestNeighbors
 
     Returns:
