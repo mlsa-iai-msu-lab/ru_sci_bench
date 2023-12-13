@@ -23,7 +23,7 @@ def get_ru_sci_bench_metrics(
     grid_search_cv: bool = False,
     n_jobs: int = -1,
     max_iter: int = 100,
-    silent=False
+    silent: bool = False
 ) -> dict:
     """Run ruSciBench tasks.
 
