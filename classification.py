@@ -105,8 +105,6 @@ def get_ru_sci_bench_metrics(
             data_paths.elibrary_oecd_ru_train,
             data_paths.elibrary_oecd_ru_test,
         )
-        if not silent:
-            print('Classifier training...')
         results['elibrary_oecd_ru'] = classify(
             X_train, y_train, X_test, y_test, get_cls_report=get_cls_report,
             grid_search_cv=grid_search_cv, n_jobs=n_jobs, max_iter=max_iter, silent=silent
@@ -120,8 +118,6 @@ def get_ru_sci_bench_metrics(
             data_paths.elibrary_grnti_ru_train,
             data_paths.elibrary_grnti_ru_test,
         )
-        if not silent:
-            print('Classifier training...')
         results['elibrary_grnti_ru'] = classify(
             X_train, y_train, X_test, y_test, get_cls_report=get_cls_report,
             grid_search_cv=grid_search_cv, n_jobs=n_jobs, max_iter=max_iter, silent=silent
@@ -136,8 +132,6 @@ def get_ru_sci_bench_metrics(
             data_paths.elibrary_oecd_en_train,
             data_paths.elibrary_oecd_en_test,
         )
-        if not silent:
-            print('Classifier training...')
         results['elibrary_oecd_en'] = classify(
             X_train, y_train, X_test, y_test, get_cls_report=get_cls_report,
             grid_search_cv=grid_search_cv, n_jobs=n_jobs, max_iter=max_iter, silent=silent
@@ -151,8 +145,6 @@ def get_ru_sci_bench_metrics(
             data_paths.elibrary_grnti_en_train,
             data_paths.elibrary_grnti_en_test,
         )
-        if not silent:
-            print('Classifier training...')
         results['elibrary_grnti_en'] = classify(
             X_train, y_train, X_test, y_test, get_cls_report=get_cls_report,
             grid_search_cv=grid_search_cv, n_jobs=n_jobs, max_iter=max_iter, silent=silent
