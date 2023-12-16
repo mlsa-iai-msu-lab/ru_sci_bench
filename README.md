@@ -1,6 +1,6 @@
 # Code for ruSciBench benchmark
 
-Code to use the ruSciBench benchmark: takes embeddings of texts from the benchmark dataset as input, returns metrics values.
+Code to use the ruSciBench benchmark: takes embeddings of texts from the benchmark dataset as input, returns metrics values. Code partially based on [SciDocs](https://github.com/allenai/scidocs).
 
 [Habr post](https://habr.com/ru/articles/781032/)
 
