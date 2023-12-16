@@ -17,9 +17,7 @@ class DataPaths:
         self.elibrary_oecd_full_train = os.path.join(base_path, "elibrary_oecd_full", "train.csv")
         self.elibrary_oecd_full_test = os.path.join(base_path, "elibrary_oecd_full", "test.csv")
 
-        self.elibrary_grnti_full_train = os.path.join(
-            base_path, "elibrary_grnti_full", "train.csv"
-        )
+        self.elibrary_grnti_full_train = os.path.join(base_path, "elibrary_grnti_full", "train.csv")
         self.elibrary_grnti_full_test = os.path.join(base_path, "elibrary_grnti_full", "test.csv")
 
         self.elibrary_oecd_ru_train = os.path.join(base_path, "elibrary_oecd_ru", "train.csv")
