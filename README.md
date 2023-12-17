@@ -6,7 +6,7 @@ Code to use the ruSciBench benchmark: takes embeddings of texts from the benchma
 
 [Benchmark text data](https://huggingface.co/datasets/mlsa-iai-msu-lab/ru_sci_bench)
 
-[Google Colab example](https://colab.research.google.com/drive/1d-o43S8BYZXQFNSbGMO_ot8CuC5hW2O1?usp=sharing)
+[Google Colab example](https://colab.research.google.com/drive/1S04UOLRYuI2J5qM2QkoWqSbv6GO94YrP?usp=sharing)
 
 
 ### Authors
