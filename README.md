@@ -13,7 +13,7 @@ Code to use the ruSciBench benchmark: takes embeddings of texts from the benchma
 Benchmark developed by MLSA Lab of Institute for AI, MSU.
 
 ### Acknowledgement
-We would like to thank [eLibrary](https://elibrary.ru/) for provided datasets. The research is part of the project #23-Ш05-21 SES MSU "Development of mathematical methods of machine learning for processing large-volume textual scientific information"
+The research is part of the project #23-Ш05-21 SES MSU "Development of mathematical methods of machine learning for processing large-volume textual scientific information". We would like to thank [eLibrary](https://elibrary.ru/) for provided datasets.
 
 ### Contacts
 Nikolai Gerasimenko (nikgerasimenko@gmail.com), Alexey Vatolin (vatolinalex@gmail.com)
