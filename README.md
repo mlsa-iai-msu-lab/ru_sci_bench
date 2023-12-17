@@ -15,5 +15,5 @@ Benchmark developed by MLSA Lab of Institute for AI, MSU.
 ### Acknowledgement
 We would like to thank [eLibrary](https://elibrary.ru/) for provided datasets.
 
-### Contact
-Nikolai Gerasimenko (nikgerasimenko@gmail.com).
+### Contacts
+Nikolai Gerasimenko (nikgerasimenko@gmail.com), Alexey Vatolin (vatolinalex@gmail.com)
