@@ -8,7 +8,7 @@ from sklearn.model_selection import GridSearchCV
 from sklearn.neighbors import NearestNeighbors
 from sklearn.svm import LinearSVC
 
-from utils import DataPaths, load_embeddings_from_jsonl, print_metrics
+from ru_sci_bench.utils import DataPaths, load_embeddings_from_jsonl, print_metrics
 
 np.random.seed(1)
 
